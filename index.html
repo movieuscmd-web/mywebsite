@@ -1,264 +1,209 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IIT-JEE-TEST | Hub</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IIT-JEE Secure Anon - Final</title>
 <style>
-body{margin:0;font-family:Arial;background:#f0f4ff;color:#222}
-header{background:#101c4a;color:white;padding:50px 20px;text-align:center}
-header h1{font-size:36px;margin:0}
-header span{color:#ffcc00}
-.card{background:white;padding:20px;border-radius:16px;box-shadow:0 5px 15px rgba(0,0,0,0.1);margin:15px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
-.btn{background:#101c4a;color:white;padding:12px 24px;border-radius:30px;text-decoration:none;display:inline-block;font-weight:bold;margin:5px}
-.btn-yellow{background:#ffcc00;color:#101c4a}
-h2{color:#101c4a;border-left:6px solid #ffcc00;padding-left:12px}
-table{width:100%;border-collapse:collapse} th,td{border:1px solid #ddd;padding:12px} th{background:#101c4a;color:white}
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f1f2f6}
+.topbar{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1);position:sticky;top:0;z-index:100}
+.hamburger{font-size:26px;cursor:pointer;padding:0 8px}
+.drawer{position:fixed;top:0;left:-270px;width:250px;height:100%;background:#111;color:#fff;z-index:250;transition:.3s;padding-top:60px}
+.drawer.open{left:0}.drawer a{display:block;padding:14px 20px;color:#fff;text-decoration:none;border-bottom:1px solid #222}.drawer a:hover{background:#6c5ce7}
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;z-index:200}.overlay.show{display:block}
+.centerWrap{min-height:85vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;padding:20px}
+.bigCard{background:#fff;border:2px solid #000;border-radius:12px;padding:26px 32px;cursor:pointer;box-shadow:5px 5px 0 #000;min-width:260px;text-align:left;transition:.1s}
+.bigCard:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}.bigCard h2{margin:0;font-size:24px;line-height:1.2}
+.box{max-width:420px;margin:18px auto;background:#1a1a1a;color:#fff;padding:22px;border-radius:16px;text-align:center;border:1px solid #333}
+.box input,.box textarea,.box select{width:92%;padding:12px;margin:7px 0;border-radius:10px;border:none;background:#2d2d2d;color:#fff;text-align:center}
+.box button{width:94%;padding:12px;margin:7px 0;border-radius:10px;border:none;background:#6c5ce7;color:#fff;font-weight:bold;cursor:pointer}
+.box button:disabled{background:#444;cursor:not-allowed}
+.robotBox{background:#f9f9f9;border:1px solid #d3d3d3;border-radius:4px;padding:12px;display:flex;align-items:center;gap:12px;width:92%;margin:12px auto}
+.codeBox{background:#2d2d2d;padding:12px;border-radius:10px;margin:10px 0;border:2px dashed #00b894;font-size:19px;letter-spacing:2px}
+.captchaModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);display:none;justify-content:center;align-items:center;z-index:400}
+.captchaContent{background:#fff;color:#000;padding:22px;border-radius:12px;width:90%;max-width:360px;text-align:center}
+.section{display:none;padding:10px}.section.active{display:block}
+.chatWrap{display:flex;gap:10px;flex-wrap:wrap}
+#users{width:100%;max-width:280px;background:#1a1a1a;color:#fff;height:68vh;overflow-y:auto;border-radius:12px}
+#chatArea{flex:1;min-width:280px;background:#1a1a1a;color:#fff;height:68vh;display:flex;flex-direction:column;border-radius:12px}
+.user{padding:10px;border-bottom:1px solid #222;cursor:pointer;display:flex;align-items:center;gap:8px}.user:hover{background:#6c5ce7}
+.msg{margin:6px;padding:10px 14px;border-radius:18px;max-width:75%;word-break:break-word;font-size:14px}.me{background:#6c5ce7;margin-left:auto}.other{background:#2d2d2d}
+.anon{background:#2d2d2d;margin:6px auto;text-align:center;max-width:90%;border-radius:12px;color:#ddd}
+.encBadge{font-size:10px;color:#00b894;text-align:center;padding:6px;background:#0f0f0f;border-radius:10px;margin:6px}
+.tabBtn{padding:8px 14px;border:none;border-radius:20px;cursor:pointer;background:#2d2d2d;color:#fff;margin-right:6px}.tabBtn.active{background:#6c5ce7}
+.page{background:#fff;color:#000;border-radius:12px;padding:12px;margin:12px 0}pre{white-space:pre-wrap;font-size:13px;background:#f5f5ff;padding:10px;border-radius:8px;line-height:1.6}
+.profilePic{width:86px;height:86px;border-radius:50%;background:#6c5ce7;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 10px;overflow:hidden;border:3px solid #fff;cursor:pointer}
+.emojiPicker{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0}.emojiPicker span{font-size:22px;cursor:pointer;padding:5px;border-radius:6px;background:#2d2d2d}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
 </head>
 <body>
-<header>
-<h1>IIT-JEE-TEST</h1>
-<p>Complete Working Notes for JEE Mains & Advanced</p>
-<a class="btn btn-yellow" href="#notes">Get Notes Free</a>
-</header>
-<section style="max-width:1000px;margin:auto;padding:30px 20px">
-<div class="card" style="text-align:center"><h3>🔥 Trusted by 5000+ JEE Aspirants</h3></div>
-<h2>Our Subjects</h2>
-<div class="grid">
-<a href="physics.html" style="text-decoration:none;"><div class="card"><h3>⚛️ Physics</h3><p>Mechanics, Electro etc.</p></div></a>
-<a href="chemistry.html" style="text-decoration:none;"><div class="card"><h3>🧪 Chemistry</h3><p>Organic, Inorganic etc.</p></div></a>
-<a href="maths.html" style="text-decoration:none;"><div class="card"><h3>📐 Maths</h3><p>Calculus, Algebra etc.</p></div></a>
+
+<!-- LOGIN PAGE - FIRST -->
+<div id="loginScreen">
+<div class="box" style="margin-top:45px">
+<h2>🔐 Secure Login</h2>
+<p style="color:#888;font-size:11px">Login ke baad hi main page khulega</p>
+<input id="username" placeholder="Username (min 4)">
+<input id="password" type="password" placeholder="Password (min 3)">
+<div class="robotBox" id="robotBox"><input type="checkbox" id="robotCheck" onclick="openCaptcha()"><div style="flex:1;color:#000;font-size:14px;text-align:left">I am not robot</div><div style="font-size:9px;color:#555">🔒<br>Protected</div></div>
+<p id="robotMsg" style="color:#ff4757;font-size:11px;display:none">⚠️ I am not robot verify karna jaruri hai</p>
+<button id="loginBtn" onclick="login()" style="background:#00b894" disabled>Login</button>
+<button id="regBtn" onclick="register()" disabled>Create Account</button>
+<p id="msg1" style="font-size:12px;color:#00b894"></p>
+<p style="color:#666;font-size:10px;margin-top:8px">🔒 E2E Encrypted • Honeypot • Anti-Bot</p>
 </div>
-<h2 id="notes">Contact Me</h2>
-<div class="card">
-<p><b>Email:</b> movieus.cmd@gmail.com</p>
-<p><b>Mobile:</b> 6202185365</p><br>
-<a class="btn" href="mailto:movieus.cmd@gmail.com">📧 Email Me</a>
-<a class="btn" style="background:#25D366" href="https://wa.me/916202185365">💬 WhatsApp</a>
-<a class="btn btn-yellow" href="tel:6202185365">📞 Call Me</a>
 </div>
-</section>
-<footer style="text-align:center;padding:20px;background:#101c4a;color:white">© 2026 Mukesh JEE Notes | movieus.cmd@gmail.com | 6202185365</footer>
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Full Periodic - Exact Code</title>
-<style>
-body{font-family:Arial;background:#f1f2f6;padding:10px}
-.page{background:#fff;border-radius:12px;padding:15px;margin:18px 0;border-left:6px solid #6c5ce7}
-pre{white-space:pre-wrap;font-family:Courier New;font-size:13px;line-height:1.7;background:#f9f9ff;padding:12px;border-radius:8px}
-</style>
-</head><body>
-<h1 style="text-align:center;background:#2f3542;color:#fff;padding:15px;border-radius:12px">PERIODIC PROPERTIES - Page 6 to 31 EXACT</h1>
 
-<div class="page"><h2>EXERCISE-I - Page 6</h2><pre>
-EXERCISE-I
-1. Atomic weight of Cl=35.5 and of I=127. According to Doeberiner triad rule, atomic weight of Br will be :
-(1) 80.0 (2) 162.5 (3) 81.25 (4) 91.5
-2. There are 10 neutrons in the nucleus of the elements 19M. It belongs to :
-(1) f-block (2) s-block (3) d-block (4) none of these
-3. The elements of groups, 1, 2, 13, 14, 15, 16, 17 and 18 are collectively called -
-(1) Noble gases (2) Representative or normal elements (3) Transition elements (4) Inner transition elements
-4. In Lother Meyer curve, the element in the peak of curve will be
-(1) F (2) Na (3) Mg (4) Ne
-5. According to Mendeleeve's periodic law, physical and chemical properties are function of
-(1) Atomic number (2) Atomic weight (3) Atomic volume (4) Number of neutron
-6. Atomic number of Ag is 47. In the same group the atomic number of elements placed above and below Ag will be
-(1) 37, 67 (2) 29, 79 (3) 39, 69 (4) 18, 28
-7. The number of elements in 5th and 6th period of periodic table are respectively -
-(1) 8, 18 (2) 18, 18 (3) 18, 32 (4) 18, 28
-8. An element has atomic number 37. The block and group of this element are respectively :
-(1) s and 1st (2) p and 17th (3) s and 2nd (4) p and 13th
-9. Atomic radii of F & Ne in Angstrom are respectively given by :
-(1) 0.72, 1.60 (2) 1.60, 1.60 (3) 0.72, 0.72 (4) 1.60, 0.72
-10. Which one of the following is the smallest in size ?
-(1) N3- (2) O2- (3) F- (4) Na+
-11. Which of the following is the correct order of size of the given species
-(1) I > I- > I+ (2) I+ > I- > I (3) I > I+ > I- (4) I- > I > I+
-12. The correct order of size would be -
-(1) Ni < Pd ~ Pt (2) Pd < Pt < Ni (3) Pt > Ni > Pd (4) Pd > Pt > Ni
-13. Arrange the following in order of increasing atomic radii Na, Si, Al, Ar -
-(1) Na < Si < Al < Ar (2) Si < Al < Na < Ar (3) Ar < Al < Si < Na (4) Na < Al < Si < Ar
-14. Arrange the elements in increasing order of atomic radius Na, Rb, K, Mg -
-(1) Na < K < Mg < Rb (2) K < Na < Mg < Rb (3) Mg < Na < K < Rb (4) Rb < K < Mg < Na
-</pre></div><!-- PART 2 START - Page 11 to 20 -->
-<div class="page"><h2>EXERCISE-II - Page 11 (Q1-Q10)</h2><pre>
-EXERCISE-II
-1. The element with atomic number 57 belongs to :
-(1) s-block (2) p-block (3) d-block (4) f-block
+<div class="captchaModal" id="captchaModal">
+<div class="captchaContent">
+<h3 id="captchaQ">Verify</h3><p id="captchaDesc" style="font-size:13px;color:#555"></p>
+<input id="captchaInput" type="number" placeholder="Answer" style="width:92%;padding:12px;border-radius:8px;border:1px solid #ccc">
+<button onclick="verifyCaptcha()" style="width:100%;padding:11px;background:#6c5ce7;color:#fff;border:none;border-radius:8px;margin-top:10px">Verify</button>
+<p id="captchaErr" style="color:red;font-size:12px"></p>
+</div>
+</div>
 
-2. Element in periodic table with electronic configuration as [Ar]3d5 4s1 is placed in :
-(1) 1st group, s-block (2) 2nd group, s-block
-(3) 5th group, d-block (4) 6th group, d-block
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none">
+<div class="topbar"><span class="hamburger" onclick="toggleDrawer()">≡</span><span style="margin-left:10px;font-weight:bold">Anon Network</span><span style="margin-left:auto;font-size:11px;color:#00b894" id="topUser"></span></div>
+<div class="drawer" id="drawer">
+<a href="#" onclick="showSection('home');toggleDrawer()">🏠 Main Page</a>
+<a href="#" onclick="showSection('profileSec');toggleDrawer()">👤 Manage Profile (Optional)</a>
+<a href="#" onclick="showSection('roomCodeSec');toggleDrawer()">🔑 Room Code</a>
+<a href="#" onclick="showSection('chat');toggleDrawer()">💬 Chat Room</a>
+<a href="#" onclick="showSection('periodic');toggleDrawer()">📚 Periodic 6-31</a>
+<a href="#" onclick="logout()" style="color:#ff6b6b">🚪 Logout</a>
+</div>
+<div class="overlay" id="overlay" onclick="toggleDrawer()"></div>
 
-3. Choose the incorrect option for the order of atomic radius :
-(1) Au < Ag < Cu (2) Li < Ne, Na < Ar
-(3) O2- > O- > O > O+ (4) Sc < Y < La
+<!-- MAIN PAGE AFTER LOGIN -->
+<div id="home" class="section active">
+<div class="centerWrap">
+<div class="bigCard" onclick="showSection('profileSec')">
+<h2>👤 Manage<br>Profile</h2><p style="font-size:12px;color:#666;margin:6px 0 0">Optional - if you want</p>
+</div>
+<div class="bigCard" onclick="showSection('roomCodeSec')" style="background:#6c5ce7;color:#fff;border-color:#000">
+<h2>Enter the<br>chat room</h2><p style="font-size:11px;margin:6px 0 0;opacity:.9">🔒 E2E Encrypted • Public + Private</p>
+</div>
+<p style="color:#666;font-size:12px" id="homeProfile">Profile not set - <a href="#" onclick="showSection('profileSec')" style="color:#6c5ce7">Set now (optional)</a></p>
+</div>
+</div>
 
-4. Values of IE1, IE2 and IE3 of an element are 9.32, 18.21 and 553.83 eV. What informations do these data convey?
-(1) The element has two electrons in the valence shell.
-(2) The element has two p-electrons in the valence shell.
-(3) (1) and (2) both. (4) None of the two.
+<!-- PROFILE OPTIONAL -->
+<div id="profileSec" class="section">
+<div class="box">
+<h2>👤 Manage Profile</h2><p style="color:#888;font-size:11px">Optional hai - chaho to skip karke direct chat me jao</p>
+<div class="profilePic" id="profilePic" onclick="setEmoji('🦊')"><span id="picEmoji">🦊</span></div>
+<div class="emojiPicker"><span onclick="setEmoji('🦊')">🦊</span><span onclick="setEmoji('🐯')">🐯</span><span onclick="setEmoji('👻')">👻</span><span onclick="setEmoji('🥷')">🥷</span><span onclick="setEmoji('🦁')">🦁</span><span onclick="setEmoji('🐺')">🐺</span><span onclick="setEmoji('😎')">😎</span><span onclick="setEmoji('🤖')">🤖</span><span onclick="setEmoji('👽')">👽</span><span onclick="setEmoji('🦄')">🦄</span><span onclick="setEmoji('🐼')">🐼</span><span onclick="setEmoji('🔥')">🔥</span></div>
+<input id="displayName" placeholder="Display Name (optional)">
+<input id="bio" placeholder="Bio / Mood (optional)">
+<select id="status"><option>🟢 Online</option><option>📚 Studying</option><option>😴 AFK</option><option>🎧 Music</option><option>🔒 Busy</option></select>
+<button onclick="saveProfile()" style="background:#00b894">💾 Save (Optional)</button>
+<button onclick="showSection('home')" style="background:#2d2d2d">Skip → Main Page</button>
+<button onclick="showSection('roomCodeSec')" style="background:#6c5ce7">→ Enter Chat Room</button>
+<p id="profileMsg" style="color:#00b894;font-size:12px"></p>
+</div>
+</div>
 
-5. Which of the following order is correct
-(1) S2- < Cl- < K+ : order of size (2) K < Na < Mg < Ne : order of ionisation energy
-(3) Mg < Al < Si : order ionisation energy (4) Mg2+ < Al3+ < Na+ : order of size
+<!-- ROOM CODE -->
+<div id="roomCodeSec" class="section">
+<div class="box">
+<h2>🔑 Room Secret Key</h2><p style="color:#888;font-size:11px">Ye hi E2E key hai. Same code = same room, encrypted</p>
+<div id="generatedCode" class="codeBox">----</div>
+<button onclick="generateCode()" style="background:#2d2d2d;border:1px solid #6c5ce7">🎲 Generate New Key</button>
+<input id="roomCode" placeholder="Enter Code e.g. TIGER-4829">
+<button onclick="enterChat()" style="background:#00b894">🔒 Enter Chat →</button>
+<p id="msg2" style="color:#ff4757;font-size:12px"></p>
+</div>
+</div>
 
-6. The correct order of increasing atomic radius of the following elements is :
-(1) S < O < Se < C (2) O < C < S < Se (3) O < S < Se < C (4) C < O < S < Se
+<!-- CHAT ROOM - PUBLIC ANON + PRIVATE -->
+<div id="chat" class="section">
+<div id="needRoom" style="text-align:center;padding:30px;background:#fff;border-radius:12px;color:#000"><h3>🔑 Room Key Enter Karo</h3><button onclick="showSection('roomCodeSec')" style="padding:10px 20px;background:#6c5ce7;color:#fff;border:none;border-radius:20px">Enter Key</button></div>
+<div id="chatUI" style="display:none">
+<div class="encBadge">🔒 E2E Encrypted • Room: <span id="roomName"></span> • Public msgs anon hain (no name) • Private E2E • <span id="encInfo"></span></div>
+<div style="text-align:center;padding:6px">
+<button class="tabBtn active" id="btnPublic" onclick="switchChat('public')">🌍 Public (Anonymous)</button>
+<button class="tabBtn" id="btnPrivate" onclick="switchChat('private')">🔒 Private</button>
+</div>
+<div class="chatWrap">
+<div id="users"><h4 style="padding:10px;margin:0">🟢 Online (<span id="count">0</span>)<br><small style="font-weight:normal;color:#888">Tap for private E2E</small></h4><div id="userList"></div></div>
+<div id="chatArea">
+<div id="messages" style="flex:1;overflow-y:auto;padding:12px"></div>
+<div style="padding:10px;display:flex;gap:6px"><input id="msgInput" placeholder="Type... (Public anon or Private E2E)" style="flex:1;padding:12px;border:none;border-radius:20px;background:#2d2d2d;color:#fff"><button onclick="sendMsg()" style="padding:12px 16px;border:none;background:#6c5ce7;color:#fff;border-radius:20px">Send 🔒</button></div>
+</div>
+</div>
+<p style="text-align:center;color:#666;font-size:10px">Public: sabko dikhega par naam nahi. Private: sirf 2 log decrypt kar payenge.</p>
+</div>
+</div>
 
-7. Amongst the following elements, the highest ionisation energy is :
-(1) [Ne] 3s2 3p1 (2) [Ne] 3s2 3p4 (3) [Ne] 3s2 3p3 (4) [Ne] 3s2 3p5
+<div id="periodic" class="section"><div class="page"><h3>📚 Periodic Properties - Page 6-31 EXACT</h3><pre>[Yaha apna pura Periodic 6-31 ka 68488 char wala full content paste kar dena - EXERCISE-I to ANSWER KEY PAGE 31 tak]</pre></div></div>
+</div>
 
-8. Which of the following statements are correct?
-(a) HF is a stronger acid than HCl.
-(b) among halide ions, iodide is the most powerful reducing agent.
-(c) Fluorine is the only halogen that does not show a variable oxidation state.
-(d) HOCl is a stronger acid than HOBr.
-(1) b and d (2) b and c (3) a, b and c (4) b, c, and d
+<!-- Honeypot hidden -->
+<input id="hp1" style="display:none;position:absolute;left:-9999px"><input id="hp2" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px">
 
-9. If the same element is forming oxides in different oxidation states then :
-(1) that oxide will be neutral in nature in which element will be in its highest oxidation state.
-(2) that oxide will be highest acidic in nature in which element will be in its highest oxidation state.
-(3) that oxide will be amphoteric in nature in which element will be in its highest oxidation state.
-(4) that oxide will be highly basic in nature in which element will be in its highest oxidation state.
+<script>
+let robotVerified=false,currentAnswer=null,chatMode='public';
+function toggleDrawer(){drawer.classList.toggle('open');overlay.classList.toggle('show');}
+function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function openCaptcha(){if(robotVerified)return;robotCheck.checked=false;captchaModal.style.display='flex';let a=Math.floor(3+Math.random()*9),b=Math.floor(1+Math.random()*9);currentAnswer=a+b;captchaQ.innerText='I am not robot - Verify';captchaDesc.innerText=`Solve: ${a} + ${b} =?`;captchaInput.value='';captchaErr.innerText='';}
+function verifyCaptcha(){let v=parseInt(captchaInput.value);if(v===currentAnswer){robotVerified=true;captchaModal.style.display='none';robotCheck.checked=true;robotBox.style.border='1px solid #00b894';robotBox.style.background='#e8f8f5';loginBtn.disabled=false;regBtn.disabled=false;robotMsg.style.display='none';}else{captchaErr.innerText='❌ Wrong, try again';setTimeout(openCaptcha,600);}}
 
-10. Elements with atomic number 58 to 71 are placed in :
-(1) 5th period and 4th group (2) 6th period and 3th group
-(3) 7th period and 3th group (4) 6th period and 4th group
-</pre></div>
+const gun=Gun(['https://gun-manhattan.herokuapp.com/gun']);const gunUser=gun.user();let myPair=null;
+let myId=null,myRoom=null,myProfile={emoji:'🦊',display:'',bio:'',status:'🟢 Online'};
+const words=["TIGER","GHOST","NINJA","WOLF","EAGLE","SHARK","FIRE","ICE","STORM","SHADOW","FOX","LION","DRAGON","VIPER","COBRA","PHANTOM","BLAZE","FROST"];
+function generateCode(){let w=words[Math.floor(Math.random()*words.length)];let n=Math.floor(1000+Math.random()*9000);let c=w+"-"+n;generatedCode.innerText=c;roomCode.value=c;}generateCode();
+function setEmoji(e){myProfile.emoji=e;picEmoji.innerText=e;}
+function saveProfile(){myProfile.display=displayName.value.trim()||myId;myProfile.bio=bio.value.trim();myProfile.status=status.value;localStorage.setItem('myProfile',JSON.stringify(myProfile));gun.get('profiles').get(myId).put(myProfile);profileMsg.innerText='✅ Saved (optional)';homeProfile.innerText=`${myProfile.emoji} ${myProfile.display} - ${myProfile.status}`;}
+function register(){if(!robotVerified){robotMsg.style.display='block';return;}let u=username.value.trim(),p=password.value.trim();if(u.length<4||p.length<3)return alert('Username 4+, Pass 3+');gunUser.create(u,p,ack=>{msg1.innerText=ack.err?"❌ "+ack.err:"✅ Created! Now Login";});}
+function login(){if(!robotVerified){robotMsg.style.display='block';return;}let u=username.value.trim(),p=password.value.trim();gunUser.auth(u,p,async ack=>{if(ack.err){msg1.innerText="❌ "+ack.err;}else{myId=u;myPair=gunUser._.sea;localStorage.setItem('anonUser',u);localStorage.setItem('anonPass',p);let saved=localStorage.getItem('myProfile');if(saved){myProfile=JSON.parse(saved);displayName.value=myProfile.display;bio.value=myProfile.bio;status.value=myProfile.status;setEmoji(myProfile.emoji);homeProfile.innerText=`${myProfile.emoji} ${myProfile.display}`;}else{displayName.value=u;homeProfile.innerText=`${u} - Profile optional`}loginScreen.style.display='none';mainApp.style.display='block';topUser.innerText='🔒 '+u;gun.get('pubkeys').get(myId).put({pub:myPair.pub,epub:myPair.epub});showSection('home');}});}
 
-<div class="page"><h2>EXERCISE-II - Page 12 (Q11-Q24)</h2><pre>
-11. Which of the following is not concerned to effective nuclear charge?
-(1) Higher ionization potential of carbon than boron
-(2) Higher ionization potential of magnesium than aluminium
-(3) Higher values of successive ionization energy
-(4) Higher electronegativity of Mn7+ than Mn4+
+function enterChat(){let code=roomCode.value.trim().toUpperCase();if(code.length<4){msg2.innerText="Code dalo e.g. TIGER-4829";return;}myRoom=code;localStorage.setItem('roomCode',code);needRoom.style.display='none';chatUI.style.display='block';roomName.innerText=myRoom;encInfo.innerText=myRoom+" + ECDH";showSection('chat');initChat();}
 
-12. Which one of the following oxide have highest acidic character?
-(1) CO2 (2) ClO2 (3) SiO2 (4) SO2
-
-13. Which is a true statement?
-(1) Larger is the value of ionisation energy easier is the formation of cation.
-(2) Larger is the value of electron affinity easier is the formation of anion.
-(3) Larger is the value of ionisation energy as well as electron affinity the smaller is the electronegativity of atom.
-(4) Larger is the Zeff larger is the size of atom.
-
-14. Electron gain enthalpy will be positive in
-(1) O2- is formed from O-1 (2) O1- is formed from O
-(3) S-1 is formed from S (4) Na- is formed from Na
-
-15. The element which has highest electron affinity?
-(1) Oxygen (2) Sulphur (3) Nitrogen (4) Phosphorus
-
-16. An atom with high electronegativity generally has a
-(1) Low electron affinity (2) Small atomic number (3) Large atomic radius (4) High ionisation potential
-
-17. For electron affinity of halogens which of the following is correct?
-(1) Br > F (2) F > Cl (3) Br < Cl (4) F < I
-
-18. The correct order of negative electron gain enthalpy is :
-(1) Be < B < C < N (2) Be < N < B < C (3) N < Be < C < B (4) N < C < B < Be
-
-19. Increasing order of second ionization energy is
-(1) Ne < O < F < N < B < C < Be (2) Be < C < B < N < F < O < Ne
-(3) Be < B < C < N < F < O < Ne (4) B < C < N < O < F < Be < Ne
-
-20. The first ionisation potentials of Na, Mg, Al and Si are in the order
-(1) Na < Mg > Al < Si (2) Na < Mg < Al > Si (3) Na > Mg > Al > Si (4) Na > Mg > Al < Si
-
-21. Which of the following is wrong -
-(1) NH3 < PH3 < AsH3 Acidic character (2) Li < Be < B < C IE1
-(3) Al2O3 < MgO < Na2O < K2O Basic character (4) Li+ < Na+ < K+ < Cs+ Ionic radius
-
-22. Which of the following is correct order of increasing bond strength -
-(1) HF < HCl < HBr < HI (2) HI < HBr < HF < HCl
-(3) HI < HBr < HCl < HF (4) HCl < HBr < HF < HI
-
-23. Density of sodium and potassium follows the order -
-(1) K < Na (2) K > Na (3) Na = K (4) None of these
-
-24. The size of the species, Pb, Pb2+, Pb4+ decreases as -
-(1) Pb4+ > Pb2+ > Pb (2) Pb > Pb2+ > Pb4+ (3) Pb > Pb4+ > Pb2+ (4) Pb4+ > Pb > Pb2+
-</pre></div>
-
-<div class="page"><h2>EXERCISE-III - JEE MAIN - Page 13 (Q1-Q10)</h2><pre>
-EXERCISE-III (Question asked in previous JEE-MAIN)
-
-1. B has a smaller first ionization enthalpy than Be. Consider the following statements : [JEE-Main-Online 2020]
-(I) It is easier to remove 2p electron than 2s electron.
-(II) 2p electron of B is more shielded from the nucleus by the inner core of electrons than the 2s electrons of Be.
-(III) 2s electrons has more penetration power than 2p electron.
-(IV) Atomic radius of B is more than Be (atomic number B=5, Be=4)
-The correct statements are : (1) (II), (III) and (IV) (2) (I), (III) and (IV) (3) (I), (II) and (IV) (4) (I), (II) and (III)
-
-2. The acidic, basic and amphoteric oxides, respectively, are : [JEE-Main-Online 2020]
-(1) MgO, Cl2O, Al2O3 (2) Na2O, SO3, Al2O3 (3) N2O3, Li2O, Al2O3 (4) Cl2O, CaO, P4O10
-
-3. The first ionization energy (in kJ/mol) of Na, Mg, Al and Si respectively, are : [JEE-Main-Online 2020]
-(1) 496, 577, 786, 737 (2) 786, 737, 577, 496 (3) 496, 737, 577, 786 (4) 496, 577, 737, 786
-
-4. The increasing order of the atomic radii of the following elements is: [JEE-Main-Online 2020]
-(a) C (b) O (c) F (d) Cl (e) Br
-(1) (a) < (b) < (c) < (d) < (e) (2) (d) < (c) < (b) < (a) < (e) (3) (c) < (b) < (a) < (d) < (e) (4) (b) < (c) < (d) < (a) < (e)
-
-5. The atomic radius of Ag is closest to : [JEE-Main-Online 2020] (1) Hg (2) Au (3) Cu (4) Ni
-
-6-10. [Same as PDF - Cl, S, Li etc electron gain, ionization trends...]
-</pre></div><!-- PART 3 START - Page 21 to 31 - FINAL -->
-<div class="page"><h2>EXERCISE-III - Page 21-22 (Q70-Q90) JEE MAIN 2022-2023</h2><pre>
-70. The difference between electron gain enthalpies will be maximum between : [JEE-Main-Online 2023]
-(1) Ne and F (2) Ar and F (3) Ne and Cl (4) Ar and Cl
-
-71. The correct order of electronegativity for given elements is : [JEE-Main-Online 2023]
-(1) P > Br > C > At (2) Br > P > At > C (3) Br > C > At > P (4) C > P > At > Br
-
-72-85. [JEE MAIN 2021-2022 Previous Year - Electron gain, ionization, quantum numbers]
-
-86. Which of the following is not the correct set of quantum numbers?
-(1) n=3, l=0, m=0 (2) n=3, l=2, m=-2 (3) n=2, l=1, m=1 (4) n=2, l=2, m=2
-
-87-95. [Size, ionization, electronegativity trends]
-</pre></div>
-
-<div class="page"><h2>EXERCISE-IV - Page 29-30 - IIT-JEE Previous Year</h2><pre>
-EXERCISE-IV (Question asked in previous IIT-JEE / JEE-Advanced)
-
-1. The element with atomic number 57 belongs to : (1) s-block (2) p-block (3) d-block (4) f-block
-
-2. The first ionization energy of Mg is 737 kJ/mol, Al is 577 kJ/mol. Reason is :
-(1) Mg has fully filled s orbital (2) Al has p electron easier to remove...
-
-3-10. [IIT-JEE 2010-2019 PYQ - Periodic Properties]
-
-11. Which of the following has highest electron affinity?
-(1) F (2) Cl (3) Br (4) I -> Ans Cl due to small size of F repulsion
-
-12-18. [Advanced level - screening effect, effective nuclear charge]
-</pre></div>
-
-<div class="page"><h2>ANSWER KEY - Page 31 - EXACT</h2><pre>
-ANSWER KEY
-
-EXERCISE-I
-1. (1) 80.0 2. (2) s-block 3. (2) Representative 4. (2) Na
-5. (2) Atomic weight 6. (2) 29,79 7. (3) 18,32 8. (1) s and 1st
-9. (1) 0.72, 1.60 10. (4) Na+ 11. (4) I- > I > I+ 12. (1) Ni < Pd ~ Pt
-13. (3) Ar < Al < Si < Na 14. (3) Mg < Na < K < Rb
-15. (3) Fe, Co, Ni 16. (2) Negative 17. (3) Cl+e->Cl- 18. (4) Always endothermic
-19. (2) (ii), (iii) 20. (2) B < Be < C < N 21. (2) Noble gases 22. (2) He
-23. (3) decreases with increase in atomic radii 24. (2) Na < Al < Mg < Si
-... [Full answer key up to Q68]
-
-EXERCISE-II
-1. (3) d-block 2. (4) 6th group, d-block 3. (1) Au<Ag<Cu wrong 4. (1) two electrons in valence shell
-5. (1) S2- < Cl- < K+ 6. (2) O < C < S < Se 7. (4) [Ne]3s2 3p5 8. (4) b,c,d
-... [Up to Q24]
-
-EXERCISE-III & IV Answer Key as per Vibrant Academy Page 31
-</pre></div>
-
+let online,publicChat,privateChats,users={},selectedUser=null,selectedUserPub=null;
+function initChat(){
+ online=gun.get('room-'+myRoom+'-users');
+ publicChat=gun.get('room-'+myRoom+'-public');
+ privateChats=gun.get('room-'+myRoom+'-private');
+ online.get(myId).put({id:myId,profile:myProfile,time:Date.now()});
+ online.map().on((d,id)=>{if(!d)return;if(Date.now()-d.time>35000){online.get(id).put(null);return;}if(id==myId)return;users[id]=d;renderUsers();});
+ setInterval(()=>online.get(myId).put({id:myId,profile:myProfile,time:Date.now()}),5000);
+ // Public anon messages listener - E2E with room code only
+ publicChat.map().on(async m=>{
+  if(!m||!m.enc||chatMode!=='public')return;
+  try{let dec=await SEA.decrypt(m.enc,myRoom);if(dec){addPublicMsg(dec);}}catch(e){}
+ });
+}
+function renderUsers(){let h='';Object.keys(users).forEach(id=>{let p=users[id].profile||{emoji:'🕶️',display:id};h+=`<div class="user" onclick="openPrivate('${id}')"><span style="font-size:20px">${p.emoji||'🕶️'}</span><div><b>${p.display||id}</b><br><small>tap → private E2E</small></div></div>`;});userList.innerHTML=h;count.innerText=Object.keys(users).length;}
+function switchChat(mode){
+ chatMode=mode;btnPublic.classList.toggle('active',mode==='public');btnPrivate.classList.toggle('active',mode==='private');
+ messages.innerHTML='';selectedUser=null;
+ if(mode==='public'){messages.innerHTML=`<p style="text-align:center;color:#00b894;font-size:11px">🌍 Public Room ${myRoom}<br>All msgs visible but ANONYMOUS (no name) • Encrypted with Room Key</p>`;publicChat.map().on(async m=>{if(!m||!m.enc)return;try{let dec=await SEA.decrypt(m.enc,myRoom);if(dec)addPublicMsg(dec);}catch(e){}});}
+ else{messages.innerHTML=`<p style="text-align:center;color:#888;font-size:11px">🔒 Select user from left for private E2E chat<br>Only you two can decrypt</p>`;}
+}
+function addPublicMsg(t){let d=document.createElement('div');d.className='msg anon';d.innerText='🕶️ Anonymous: '+t;messages.appendChild(d);messages.scrollTop=99999;}
+function addPrivateMsg(t,ty){let d=document.createElement('div');d.className='msg '+ty;d.innerText=t;messages.appendChild(d);messages.scrollTop=99999;}
+function openPrivate(id){
+ selectedUser=id;chatMode='private';btnPublic.classList.remove('active');btnPrivate.classList.add('active');
+ gun.get('pubkeys').get(id).once(d=>{if(d)selectedUserPub=d;});
+ messages.innerHTML=`<p style="text-align:center;color:#00b894;font-size:11px">🔒 Private E2E with ${id}<br>RoomKey + ECDH • No one else can read</p>`;
+ let chatId=[myId,selectedUser,myRoom].sort().join('_');
+ privateChats.get(chatId).map().on(async m=>{if(!m||!m.enc)return;try{let secret=selectedUserPub?await SEA.secret(selectedUserPub.epub,myPair):myRoom;let dec=await SEA.decrypt(m.enc,secret+myRoom);if(dec)addPrivateMsg(dec,m.from==myId?'me':'other');}catch(e){}});
+}
+async function sendMsg(){
+ let t=msgInput.value.trim();if(!t)return;
+ if(chatMode==='public'){
+  try{let enc=await SEA.encrypt(t,myRoom);publicChat.set({enc:enc,time:Date.now()});msgInput.value='';}catch(e){alert('Encrypt error');}
+ } else {
+  if(!selectedUser)return alert('Private ke liye left se user select karo');if(!selectedUserPub)return alert('Public key loading... dubara tap karo');
+  try{let secret=await SEA.secret(selectedUserPub.epub,myPair);let enc=await SEA.encrypt(t,secret+myRoom);let chatId=[myId,selectedUser,myRoom].sort().join('_');privateChats.get(chatId).set({enc:enc,from:myId,time:Date.now()});msgInput.value='';}catch(e){alert('Private encrypt error');}
+ }
+}
+function logout(){localStorage.clear();location.reload();}
+setInterval(()=>{if(hp1.value!=""||hp2.value!=""){document.body.innerHTML="<h1 style='text-align:center;margin-top:100px'>🤖 Bot Detected - Blocked by Honeypot</h1>";}},800);
+window.onload=()=>{let su=localStorage.getItem('anonUser'),sp=localStorage.getItem('anonPass');if(su&&sp){username.value=su;password.value=sp;}}
+</script>
 </body>
 </html>
-
