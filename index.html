@@ -1,219 +1,277 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IIT-JEE Secure Anon - Final</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f1f2f6}
-.topbar{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1);position:sticky;top:0;z-index:100}
-.hamburger{font-size:26px;cursor:pointer;padding:0 8px}
-.drawer{position:fixed;top:0;left:-270px;width:250px;height:100%;background:#111;color:#fff;z-index:250;transition:.3s;padding-top:60px}
-.drawer.open{left:0}.drawer a{display:block;padding:14px 20px;color:#fff;text-decoration:none;border-bottom:1px solid #222}.drawer a:hover{background:#6c5ce7}
-.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;z-index:200}.overlay.show{display:block}
-.centerWrap{min-height:85vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;padding:20px}
-.bigCard{background:#fff;border:2px solid #000;border-radius:12px;padding:26px 32px;cursor:pointer;box-shadow:5px 5px 0 #000;min-width:260px;text-align:left;transition:.1s}
-.bigCard:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}.bigCard h2{margin:0;font-size:24px;line-height:1.2}
-.box{max-width:420px;margin:18px auto;background:#1a1a1a;color:#fff;padding:22px;border-radius:16px;text-align:center;border:1px solid #333}
-.box input,.box textarea,.box select{width:92%;padding:12px;margin:7px 0;border-radius:10px;border:none;background:#2d2d2d;color:#fff;text-align:center}
-.box button{width:94%;padding:12px;margin:7px 0;border-radius:10px;border:none;background:#6c5ce7;color:#fff;font-weight:bold;cursor:pointer}
-.box button:disabled{background:#444;cursor:not-allowed}
-.robotBox{background:#f9f9f9;border:1px solid #d3d3d3;border-radius:4px;padding:12px;display:flex;align-items:center;gap:12px;width:92%;margin:12px auto}
-.codeBox{background:#2d2d2d;padding:12px;border-radius:10px;margin:10px 0;border:2px dashed #00b894;font-size:19px;letter-spacing:2px}
-.captchaModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);display:none;justify-content:center;align-items:center;z-index:400}
-.captchaContent{background:#fff;color:#000;padding:22px;border-radius:12px;width:90%;max-width:360px;text-align:center}
-.section{display:none;padding:10px}.section.active{display:block}
-.chatWrap{display:flex;gap:10px;flex-wrap:wrap}
-#users{width:100%;max-width:280px;background:#1a1a1a;color:#fff;height:68vh;overflow-y:auto;border-radius:12px}
-#chatArea{flex:1;min-width:280px;background:#1a1a1a;color:#fff;height:68vh;display:flex;flex-direction:column;border-radius:12px}
-.user{padding:10px;border-bottom:1px solid #222;cursor:pointer;display:flex;align-items:center;gap:8px}.user:hover{background:#6c5ce7}
-.msg{margin:6px;padding:10px 14px;border-radius:18px;max-width:75%;word-break:break-word;font-size:14px}.me{background:#6c5ce7;margin-left:auto}.other{background:#2d2d2d}
-.anon{background:#2d2d2d;margin:6px auto;text-align:center;max-width:90%;border-radius:12px;color:#ddd}
-.encBadge{font-size:10px;color:#00b894;text-align:center;padding:6px;background:#0f0f0f;border-radius:10px;margin:6px}
-.tabBtn{padding:8px 14px;border:none;border-radius:20px;cursor:pointer;background:#2d2d2d;color:#fff;margin-right:6px}.tabBtn.active{background:#6c5ce7}
-.page{background:#fff;color:#000;border-radius:12px;padding:12px;margin:12px 0}pre{white-space:pre-wrap;font-size:13px;background:#f5f5ff;padding:10px;border-radius:8px;line-height:1.6}
-.profilePic{width:86px;height:86px;border-radius:50%;background:#6c5ce7;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 10px;overflow:hidden;border:3px solid #fff;cursor:pointer}
-.emojiPicker{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0}.emojiPicker span{font-size:22px;cursor:pointer;padding:5px;border-radius:6px;background:#2d2d2d}
-</style>
- <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anonymous Secure Chat</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0f0f0f;color:#fff;font-family:system-ui,Segoe UI,Roboto}
+.centerWrap{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:15px}
+.bigCard{background:#1e1e1e;padding:25px;border-radius:16px;width:100%;max-width:420px;box-shadow:0 10px 30px rgba(0,0,0,.6);border:1px solid #2a2a2a}
+h2,h3{margin:0 0 12px}
+.box{background:#222;padding:12px;border-radius:10px;margin:12px 0;border:1px solid #333}
+input{width:100%;padding:13px;border-radius:10px;border:1px solid #333;background:#121212;color:#fff;margin:6px 0;outline:none}
+input:focus{border-color:#6c5ce7}
+button{width:100%;padding:13px;border-radius:10px;border:none;background:#6c5ce7;color:#fff;font-weight:700;cursor:pointer;margin-top:8px;font-size:15px}
+button:disabled{opacity:.35;cursor:not-allowed}
+button.active{background:#00b894 !important}
+#chatUI header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1a1a1a;border-bottom:1px solid #2a2a2a}
+.chatWrap{display:flex;gap:10px;height:calc(100vh - 56px);padding:10px}
+#users{width:32%;background:#1a1a1a;border-radius:12px;padding:10px;overflow:auto}
+#chatArea{flex:1;background:#1a1a1a;border-radius:12px;display:flex;flex-direction:column}
+#messages{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.msg{padding:10px 14px;border-radius:14px;max-width:85%;word-break:break-word;font-size:14px;line-height:1.4}
+.msg.anon{background:#2a2a2a;align-self:flex-start}
+.msg.me{background:#6c5ce7;align-self:flex-end}
+.msg.other{background:#333;align-self:flex-start}
+.user{background:#222;padding:10px;border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid #2a2a2a}
+.user:hover{background:#2e2e2e}
+#topUser{color:#00ff88;font-size:12px}
+</style>
 </head>
 <body>
 
-<!-- LOGIN PAGE - FIRST -->
-<div id="loginScreen">
-<div class="box" style="margin-top:45px">
-<h2>🔐 Secure Login</h2>
-<p style="color:#888;font-size:11px">Login ke baad hi main page khulega</p>
-<input id="username" placeholder="Username (min 4)">
-<input id="password" type="password" placeholder="Password (min 3)">
-<div class="robotBox" id="robotBox"><input type="checkbox" id="robotCheck" onclick="openCaptcha()"><div style="flex:1;color:#000;font-size:14px;text-align:left">I am not robot</div><div style="font-size:9px;color:#555">🔒<br>Protected</div></div>
-<p id="robotMsg" style="color:#ff4757;font-size:11px;display:none">⚠️ I am not robot verify karna jaruri hai</p>
-<button id="loginBtn" onclick="login()" style="background:#00b894" disabled>Login</button>
-<button id="regBtn" onclick="register()" disabled>Create Account</button>
-<p id="msg1" style="font-size:12px;color:#00b894"></p>
-<p style="color:#666;font-size:10px;margin-top:8px">🔒 E2E Encrypted • Honeypot • Anti-Bot</p>
-</div>
-</div>
-
-<div class="captchaModal" id="captchaModal">
-<div class="captchaContent">
-<h3 id="captchaQ">Verify</h3><p id="captchaDesc" style="font-size:13px;color:#555"></p>
-<input id="captchaInput" type="number" placeholder="Answer" style="width:92%;padding:12px;border-radius:8px;border:1px solid #ccc">
-<button onclick="verifyCaptcha()" style="width:100%;padding:11px;background:#6c5ce7;color:#fff;border:none;border-radius:8px;margin-top:10px">Verify</button>
-<p id="captchaErr" style="color:red;font-size:12px"></p>
-</div>
+<!-- LOGIN -->
+<div id="loginScreen" class="centerWrap">
+  <div class="bigCard">
+    <h2>🔒 Anonymous Chat</h2>
+    <p style="color:#aaa;font-size:13px">Secure • Encrypted • No History</p>
+    <div class="box">
+      <input id="username" placeholder="Username (min 2 char)">
+      <input id="password" type="password" placeholder="Password (any)">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin:10px 0">
+      <input type="checkbox" id="robotCheck" onclick="openCaptcha()" style="width:18px">
+      <label>I am not a robot</label>
+    </div>
+    <p id="robotMsg" style="display:none;color:#ff7675;font-size:12px">⚠️ Please verify captcha first</p>
+    <button id="loginBtn" onclick="login()" disabled>Login</button>
+    <button id="regBtn" onclick="register()" disabled style="background:#2d3436">Register</button>
+    <p id="msg1" style="color:#00ff88;font-size:13px;margin-top:10px"></p>
+  </div>
 </div>
 
 <!-- MAIN APP -->
 <div id="mainApp" style="display:none">
-<div class="topbar"><span class="hamburger" onclick="toggleDrawer()">≡</span><span style="margin-left:10px;font-weight:bold">Anon Network</span><span style="margin-left:auto;font-size:11px;color:#00b894" id="topUser"></span></div>
-<div class="drawer" id="drawer">
-<a href="#" onclick="showSection('home');toggleDrawer()">🏠 Main Page</a>
-<a href="#" onclick="showSection('profileSec');toggleDrawer()">👤 Manage Profile (Optional)</a>
-<a href="#" onclick="showSection('roomCodeSec');toggleDrawer()">🔑 Room Code</a>
-<a href="#" onclick="showSection('chat');toggleDrawer()">💬 Chat Room</a>
-<a href="#" onclick="showSection('periodic');toggleDrawer()">📚 Periodic 6-31</a>
-<a href="#" onclick="logout()" style="color:#ff6b6b">🚪 Logout</a>
-</div>
-<div class="overlay" id="overlay" onclick="toggleDrawer()"></div>
+  <!-- ROOM ENTRY -->
+  <div id="needRoom" class="centerWrap">
+    <div class="bigCard">
+      <h3>Enter Room Code</h3>
+      <p style="color:#aaa;font-size:12px">Share this code with friend to chat</p>
+      <p id="generatedCode" style="font-weight:900;color:#00ff88;font-size:22px;letter-spacing:2px;text-align:center;margin:15px 0"></p>
+      <input id="roomCode" placeholder="e.g. TIGER-1234">
+      <button onclick="enterChat()">Enter Chat Room</button>
+      <p id="msg2" style="color:#ff7675;font-size:13px"></p>
+    </div>
+  </div>
 
-<!-- MAIN PAGE AFTER LOGIN -->
-<div id="home" class="section active">
-<div class="centerWrap">
-<div class="bigCard" onclick="showSection('profileSec')">
-<h2>👤 Manage<br>Profile</h2><p style="font-size:12px;color:#666;margin:6px 0 0">Optional - if you want</p>
-</div>
-<div class="bigCard" onclick="showSection('roomCodeSec')" style="background:#6c5ce7;color:#fff;border-color:#000">
-<h2>Enter the<br>chat room</h2><p style="font-size:11px;margin:6px 0 0;opacity:.9">🔒 E2E Encrypted • Public + Private</p>
-</div>
-<p style="color:#666;font-size:12px" id="homeProfile">Profile not set - <a href="#" onclick="showSection('profileSec')" style="color:#6c5ce7">Set now (optional)</a></p>
-</div>
-</div>
-
-<!-- PROFILE OPTIONAL -->
-<div id="profileSec" class="section">
-<div class="box">
-<h2>👤 Manage Profile</h2><p style="color:#888;font-size:11px">Optional hai - chaho to skip karke direct chat me jao</p>
-<div class="profilePic" id="profilePic" onclick="setEmoji('🦊')"><span id="picEmoji">🦊</span></div>
-<div class="emojiPicker"><span onclick="setEmoji('🦊')">🦊</span><span onclick="setEmoji('🐯')">🐯</span><span onclick="setEmoji('👻')">👻</span><span onclick="setEmoji('🥷')">🥷</span><span onclick="setEmoji('🦁')">🦁</span><span onclick="setEmoji('🐺')">🐺</span><span onclick="setEmoji('😎')">😎</span><span onclick="setEmoji('🤖')">🤖</span><span onclick="setEmoji('👽')">👽</span><span onclick="setEmoji('🦄')">🦄</span><span onclick="setEmoji('🐼')">🐼</span><span onclick="setEmoji('🔥')">🔥</span></div>
-<input id="displayName" placeholder="Display Name (optional)">
-<input id="bio" placeholder="Bio / Mood (optional)">
-<select id="status"><option>🟢 Online</option><option>📚 Studying</option><option>😴 AFK</option><option>🎧 Music</option><option>🔒 Busy</option></select>
-<button onclick="saveProfile()" style="background:#00b894">💾 Save (Optional)</button>
-<button onclick="showSection('home')" style="background:#2d2d2d">Skip → Main Page</button>
-<button onclick="showSection('roomCodeSec')" style="background:#6c5ce7">→ Enter Chat Room</button>
-<p id="profileMsg" style="color:#00b894;font-size:12px"></p>
-</div>
+  <!-- CHAT UI -->
+  <div id="chatUI" style="display:none">
+    <header>
+      <div><b id="roomName">ROOM</b> <span id="encInfo" style="font-size:11px;color:#00b894;margin-left:8px">● Firebase Live</span></div>
+      <div style="display:flex;gap:12px;align-items:center"><span>👥 <span id="count">0</span></span><span id="topUser"></span></div>
+    </header>
+    <div class="chatWrap">
+      <div id="users">
+        <b id="online-count">0 online</b>
+        <div id="userList" style="margin-top:12px"></div>
+      </div>
+      <div id="chatArea">
+        <div style="display:flex;gap:6px;padding:8px;border-bottom:1px solid #2a2a2a">
+          <button id="btnPublic" class="active" onclick="switchChat('public')" style="width:50%">🌍 Public</button>
+          <button id="btnPrivate" onclick="switchChat('private')" style="width:50%;background:#2d3436">🔒 Private</button>
+        </div>
+        <div id="messages"></div>
+        <div style="display:flex;gap:6px;padding:10px;border-top:1px solid #2a2a2a">
+          <input id="msgInput" placeholder="Type message..." style="flex:1;margin:0">
+          <button onclick="sendMsg()" style="width:80px;margin:0">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ROOM CODE -->
-<div id="roomCodeSec" class="section">
-<div class="box">
-<h2>🔑 Room Secret Key</h2><p style="color:#888;font-size:11px">Ye hi E2E key hai. Same code = same room, encrypted</p>
-<div id="generatedCode" class="codeBox">----</div>
-<button onclick="generateCode()" style="background:#2d2d2d;border:1px solid #6c5ce7">🎲 Generate New Key</button>
-<input id="roomCode" placeholder="Enter Code e.g. TIGER-4829">
-<button onclick="enterChat()" style="background:#00b894">🔒 Enter Chat →</button>
-<p id="msg2" style="color:#ff4757;font-size:12px"></p>
+<!-- CAPTCHA MODAL -->
+<div id="captchaModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);justify-content:center;align-items:center;z-index:9999">
+  <div class="bigCard" style="max-width:320px">
+    <h3 id="captchaQ">Verification</h3>
+    <p id="captchaDesc" style="color:#aaa"></p>
+    <input id="captchaInput" placeholder="Your answer" type="number">
+    <button onclick="verifyCaptcha()">Verify</button>
+    <p id="captchaErr" style="color:#ff7675;font-size:13px;margin-top:8px"></p>
+  </div>
 </div>
-</div>
-
-<!-- CHAT ROOM - PUBLIC ANON + PRIVATE -->
-<div id="chat" class="section">
-<div id="needRoom" style="text-align:center;padding:30px;background:#fff;border-radius:12px;color:#000"><h3>🔑 Room Key Enter Karo</h3><button onclick="showSection('roomCodeSec')" style="padding:10px 20px;background:#6c5ce7;color:#fff;border:none;border-radius:20px">Enter Key</button></div>
-<div id="chatUI" style="display:none">
-<div class="encBadge">🔒 E2E Encrypted • Room: <span id="roomName"></span> • Public msgs anon hain (no name) • Private E2E • <span id="encInfo"></span></div>
-<div style="text-align:center;padding:6px">
-<button class="tabBtn active" id="btnPublic" onclick="switchChat('public')">🌍 Public (Anonymous)</button>
-<button class="tabBtn" id="btnPrivate" onclick="switchChat('private')">🔒 Private</button>
-</div>
-<div class="chatWrap">
-<div id="users"><h4 style="padding:10px;margin:0">🟢 Online (<span id="count">0</span>)<br><small style="font-weight:normal;color:#888">Tap for private E2E</small></h4><div id="userList"></div></div>
-<div id="chatArea">
-<div id="messages" style="flex:1;overflow-y:auto;padding:12px"></div>
-<div style="padding:10px;display:flex;gap:6px"><input id="msgInput" placeholder="Type... (Public anon or Private E2E)" style="flex:1;padding:12px;border:none;border-radius:20px;background:#2d2d2d;color:#fff"><button onclick="sendMsg()" style="padding:12px 16px;border:none;background:#6c5ce7;color:#fff;border-radius:20px">Send 🔒</button></div>
-</div>
-</div>
-<p style="text-align:center;color:#666;font-size:10px">Public: sabko dikhega par naam nahi. Private: sirf 2 log decrypt kar payenge.</p>
-</div>
-</div>
-
-<div id="periodic" class="section"><div class="page"><h3>📚 Periodic Properties - Page 6-31 EXACT</h3><pre>[Yaha apna pura Periodic 6-31 ka 68488 char wala full content paste kar dena - EXERCISE-I to ANSWER KEY PAGE 31 tak]</pre></div></div>
-</div>
-
-<!-- Honeypot hidden -->
-<input id="hp1" style="display:none;position:absolute;left:-9999px"><input id="hp2" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px">
 
 <script>
-let robotVerified=false,currentAnswer=null,chatMode='public';
-function toggleDrawer(){drawer.classList.toggle('open');overlay.classList.toggle('show');}
-function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
-function openCaptcha(){if(robotVerified)return;robotCheck.checked=false;captchaModal.style.display='flex';let a=Math.floor(3+Math.random()*9),b=Math.floor(1+Math.random()*9);currentAnswer=a+b;captchaQ.innerText='I am not robot - Verify';captchaDesc.innerText=`Solve: ${a} + ${b} =?`;captchaInput.value='';captchaErr.innerText='';}
-function verifyCaptcha(){let v=parseInt(captchaInput.value);if(v===currentAnswer){robotVerified=true;captchaModal.style.display='none';robotCheck.checked=true;robotBox.style.border='1px solid #00b894';robotBox.style.background='#e8f8f5';loginBtn.disabled=false;regBtn.disabled=false;robotMsg.style.display='none';}else{captchaErr.innerText='❌ Wrong, try again';setTimeout(openCaptcha,600);}}
+// ---------- CAPTCHA ----------
+let currentAnswer=0, robotVerified=false;
+function openCaptcha(){
+  if(robotVerified) return;
+  robotCheck.checked=false;
+  captchaModal.style.display='flex';
+  let a=Math.floor(3+Math.random()*9), b=Math.floor(1+Math.random()*9);
+  currentAnswer=a+b;
+  document.getElementById('captchaQ').innerText='🤖 I am not robot';
+  document.getElementById('captchaDesc').innerText=`Solve: ${a} + ${b} = ?`;
+  document.getElementById('captchaInput').value='';
+  document.getElementById('captchaErr').innerText='';
+}
+function verifyCaptcha(){
+  let v=parseInt(document.getElementById('captchaInput').value);
+  if(v===currentAnswer){
+    robotVerified=true;
+    captchaModal.style.display='none';
+    robotCheck.checked=true;
+    loginBtn.disabled=false;
+    regBtn.disabled=false;
+    robotMsg.style.display='none';
+  }else{
+    document.getElementById('captchaErr').innerText='❌ Wrong answer, try again';
+  }
+}
 
+// ---------- FIREBASE ----------
 const firebaseConfig = {
   apiKey: "AIzaSyAeu9siRl8xVuoSAiQV7V_yKhR8k9pQ6YQ",
   authDomain: "anonymouschat-c18a4.firebaseapp.com",
   databaseURL: "https://anonymouschat-c18a4-default-rtdb.firebaseio.com",
   projectId: "anonymouschat-c18a4",
+  storageBucket: "anonymouschat-c18a4.firebasestorage.app",
+  messagingSenderId: "1040348512886",
   appId: "1:1040348512886:web:37d6ff2cc2b8b2dd2b2b8f5"
 };
-if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-let myId=null,myRoom=null,myProfile={emoji:'🦊',display:'',bio:'',status:'🟢 Online'};
-const words=["TIGER","GHOST","NINJA","WOLF","EAGLE","SHARK","FIRE","ICE","STORM","SHADOW","FOX","LION","DRAGON","VIPER","COBRA","PHANTOM","BLAZE","FROST"];
-let users={}, selectedUser=null, chatMode='public';
-function initChat(){
-  const presenceRef = db.ref('rooms/'+myRoom+'/presence');
-  const myRef = presenceRef.child(myId);
-  db.ref('.info/connected').on('value', s=>{ if(s.val()){ myRef.onDisconnect().remove(); myRef.set({id:myId, time:Date.now()}); }});
-  presenceRef.on('value', snap=>{ count.innerText=snap.numChildren(); });
-  db.ref('rooms/'+myRoom+'/public').limitToLast(100).on('child_added', snap=>{ let m=snap.val(); if(m && chatMode=='public') addPublicMsg(m.text); });
-   }
- online.map().on((d,id)=>{if(!d)return;if(Date.now()-d.time>35000){online.get(id).put(null);return;}if(id==myId)return;users[id]=d;renderUsers();});
- setInterval(()=>online.get(myId).put({id:myId,profile:myProfile,time:Date.now()}),5000);
- // Public anon messages listener - E2E with room code only
- publicChat.map().on(async m=>{
-  if(!m||!m.enc||chatMode!=='public')return;
-  try{let dec=await SEA.decrypt(m.enc,myRoom);if(dec){addPublicMsg(dec);}}catch(e){}
- });
-}
-function renderUsers(){let h='';Object.keys(users).forEach(id=>{let p=users[id].profile||{emoji:'🕶️',display:id};h+=`<div class="user" onclick="openPrivate('${id}')"><span style="font-size:20px">${p.emoji||'🕶️'}</span><div><b>${p.display||id}</b><br><small>tap → private E2E</small></div></div>`;});userList.innerHTML=h;count.innerText=Object.keys(users).length;}
-function switchChat(mode){
- chatMode=mode;btnPublic.classList.toggle('active',mode==='public');btnPrivate.classList.toggle('active',mode==='private');
- messages.innerHTML='';selectedUser=null;
- if(mode==='public'){messages.innerHTML=`<p style="text-align:center;color:#00b894;font-size:11px">🌍 Public Room ${myRoom}<br>All msgs visible but ANONYMOUS (no name) • Encrypted with Room Key</p>`;publicChat.map().on(async m=>{if(!m||!m.enc)return;try{let dec=await SEA.decrypt(m.enc,myRoom);if(dec)addPublicMsg(dec);}catch(e){}});}
- else{messages.innerHTML=`<p style="text-align:center;color:#888;font-size:11px">🔒 Select user from left for private E2E chat<br>Only you two can decrypt</p>`;}
-}
-function openPrivate(id){
-  selectedUser=id; chatMode='private';
-  messages.innerHTML=`<p style="text-align:center;color:#00b894">🔒 Private with ${id}</p>`;
-  let chatId=[myId,id].sort().join('_');
-  db.ref('rooms/'+myRoom+'/private/'+chatId).limitToLast(100).on('child_added', snap=>{ let m=snap.val(); addPrivateMsg(m.text, m.from==myId?'me':'other'); });
- }
- privateChats.get(chatId).map().on(async m=>{if(!m||!m.enc)return;try{let secret=selectedUserPub?await SEA.secret(selectedUserPub.epub,myPair):myRoom;let dec=await SEA.decrypt(m.enc,secret+myRoom);if(dec)addPrivateMsg(dec,m.from==myId?'me':'other');}catch(e){}});
-}
-async function sendMsg(){
- let t=msgInput.value.trim();if(!t)return;
- if(chatMode==='public'){
-  try{let enc=await SEA.encrypt(t,myRoom);publicChat.set({enc:enc,time:Date.now()});msgInput.value='';}catch(e){alert('Encrypt error');}
- } else {
-  if(!selectedUser)return alert('Private ke liye left se user select karo');if(!selectedUserPub)return alert('Public key loading... dubara tap karo');
-  try{let secret=await SEA.secret(selectedUserPub.epub,myPair);let enc=await SEA.encrypt(t,secret+myRoom);let chatId=[myId,selectedUser,myRoom].sort().join('_');privateChats.get(chatId).set({enc:enc,from:myId,time:Date.now()});msgInput.value='';}catch(e){alert('Private encrypt error');}
- }
-}
-function logout(){localStorage.clear();location.reload();}
-setInterval(()=>{if(hp1.value!=""||hp2.value!=""){document.body.innerHTML="<h1 style='text-align:center;margin-top:100px'>🤖 Bot Detected - Blocked by Honeypot</h1>";}},800);
-window.onload=()=>{let su=localStorage.getItem('anonUser'),sp=localStorage.getItem('anonPass');if(su&&sp){username.value=su;password.value=sp;}}
-</script>
- <script>
-const firebaseConfig = { /* TERA CONFIG */ };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Ye tere #users aur #chatArea ko zinda karega
- </script>
+// ---------- APP LOGIC ----------
+const words=["TIGER","GHOST","NINJA","WOLF","EAGLE","SHARK","FIRE","ICE","STORM","SHADOW","FOX","LION","DRAGON","VIPER","COBRA","PHANTOM","BLAZE","FROST"];
+let myId=null, myRoom=null, chatMode='public', selectedUser=null;
+
+function generateCode(){
+  let w=words[Math.floor(Math.random()*words.length)];
+  let n=Math.floor(1000+Math.random()*9000);
+  let c=w+"-"+n;
+  document.getElementById('generatedCode').innerText=c;
+  document.getElementById('roomCode').value=c;
+}
+generateCode();
+
+function register(){
+  if(!robotVerified){robotMsg.style.display='block';return;}
+  let u=username.value.trim();
+  if(u.length<2) return alert('Username min 2 char');
+  localStorage.setItem('anonUser',u);
+  msg1.innerText="✅ Account created! Now click Login";
+}
+function login(){
+  if(!robotVerified){robotMsg.style.display='block';return;}
+  let u=username.value.trim();
+  if(u.length<2) return alert('Username min 2 char');
+  myId=u;
+  localStorage.setItem('anonUser',myId);
+  loginScreen.style.display='none';
+  mainApp.style.display='block';
+  topUser.innerText='🔒 '+myId;
+}
+function enterChat(){
+  let code=roomCode.value.trim().toUpperCase();
+  if(code.length<4){msg2.innerText="Enter valid room code";return;}
+  myRoom=code;
+  if(!myId) myId=localStorage.getItem('anonUser')||"User"+Math.floor(Math.random()*999);
+  needRoom.style.display='none';
+  chatUI.style.display='block';
+  roomName.innerText=myRoom;
+  initChat();
+}
+
+function initChat(){
+  const presenceRef = db.ref('rooms/'+myRoom+'/presence');
+  const myRef = presenceRef.child(myId);
+  db.ref('.info/connected').on('value', s=>{
+    if(s.val()){
+      myRef.onDisconnect().remove();
+      myRef.set({id:myId, time:Date.now()});
+    }
+  });
+  presenceRef.on('value', snap=>{
+    let c=snap.numChildren();
+    count.innerText=c;
+    document.getElementById('online-count').innerText=c+' online';
+    let html='';
+    snap.forEach(ch=>{
+      let u=ch.val();
+      if(!u || u.id==myId) return;
+      html+=`<div class="user" onclick="openPrivate('${u.id}')"><b>🕶️ ${u.id}</b><br><small style="color:#00b894">tap → private chat</small></div>`;
+    });
+    userList.innerHTML=html||'<small style="color:#666">No other user online</small>';
+  });
+
+  // Public messages
+  db.ref('rooms/'+myRoom+'/public').limitToLast(100).off();
+  db.ref('rooms/'+myRoom+'/public').limitToLast(100).on('child_added', snap=>{
+    let m=snap.val();
+    if(!m) return;
+    if(chatMode==='public') addPublicMsg(m.text, m.from);
+  });
+}
+
+function switchChat(mode){
+  chatMode=mode;
+  btnPublic.classList.toggle('active',mode==='public');
+  btnPrivate.classList.toggle('active',mode==='private');
+  messages.innerHTML='';
+  if(mode==='public'){
+    messages.innerHTML=`<p style="text-align:center;color:#00b894;font-size:11px">🌍 Public Room ${myRoom} - All messages visible</p>`;
+  }else{
+    messages.innerHTML=`<p style="text-align:center;color:#aaa;font-size:11px">🔒 Select a user from left side for private chat</p>`;
+  }
+}
+function addPublicMsg(t, from){
+  let d=document.createElement('div');
+  d.className='msg anon';
+  let isMe = from===myId;
+  d.className = isMe ? 'msg me' : 'msg anon';
+  d.innerText = (isMe ? 'You: ' : '🕶️ '+from+': ') + t;
+  messages.appendChild(d);
+  messages.scrollTop=messages.scrollHeight;
+}
+function addPrivateMsg(t, ty){
+  let d=document.createElement('div');
+  d.className='msg '+ty;
+  d.innerText=t;
+  messages.appendChild(d);
+  messages.scrollTop=messages.scrollHeight;
+}
+function openPrivate(id){
+  selectedUser=id;
+  chatMode='private';
+  btnPublic.classList.remove('active');
+  btnPrivate.classList.add('active');
+  messages.innerHTML=`<p style="text-align:center;color:#00b894;font-size:12px">🔒 Private chat with ${id} (End-to-End)</p>`;
+  let chatId=[myId,id].sort().join('_');
+  db.ref('rooms/'+myRoom+'/private/'+chatId).limitToLast(100).off();
+  db.ref('rooms/'+myRoom+'/private/'+chatId).limitToLast(100).on('child_added', snap=>{
+    let m=snap.val();
+    if(!m) return;
+    addPrivateMsg(m.text, m.from==myId?'me':'other');
+  });
+}
+function sendMsg(){
+  let t=msgInput.value.trim();
+  if(!t) return;
+  if(chatMode==='public'){
+    db.ref('rooms/'+myRoom+'/public').push({text:t,from:myId,time:Date.now()});
+  }else{
+    if(!selectedUser) return alert('Left side se user select karo private ke liye');
+    let chatId=[myId,selectedUser].sort().join('_');
+    db.ref('rooms/'+myRoom+'/private/'+chatId).push({text:t,from:myId,time:Date.now()});
+  }
+  msgInput.value='';
+}
+msgInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMsg();});
+</script>
 </body>
 </html>
