@@ -153,23 +153,25 @@ function showSection(id){document.querySelectorAll('.section').forEach(s=>s.clas
 function openCaptcha(){if(robotVerified)return;robotCheck.checked=false;captchaModal.style.display='flex';let a=Math.floor(3+Math.random()*9),b=Math.floor(1+Math.random()*9);currentAnswer=a+b;captchaQ.innerText='I am not robot - Verify';captchaDesc.innerText=`Solve: ${a} + ${b} =?`;captchaInput.value='';captchaErr.innerText='';}
 function verifyCaptcha(){let v=parseInt(captchaInput.value);if(v===currentAnswer){robotVerified=true;captchaModal.style.display='none';robotCheck.checked=true;robotBox.style.border='1px solid #00b894';robotBox.style.background='#e8f8f5';loginBtn.disabled=false;regBtn.disabled=false;robotMsg.style.display='none';}else{captchaErr.innerText='❌ Wrong, try again';setTimeout(openCaptcha,600);}}
 
-const gun=Gun(['https://gun-manhattan.herokuapp.com/gun']);const gunUser=gun.user();let myPair=null;
+const firebaseConfig = {
+  apiKey: "AIzaSyAeu9siRl8xVuoSAiQV7V_yKhR8k9pQ6YQ",
+  authDomain: "anonymouschat-c18a4.firebaseapp.com",
+  databaseURL: "https://anonymouschat-c18a4-default-rtdb.firebaseio.com",
+  projectId: "anonymouschat-c18a4",
+  appId: "1:1040348512886:web:37d6ff2cc2b8b2dd2b2b8f5"
+};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 let myId=null,myRoom=null,myProfile={emoji:'🦊',display:'',bio:'',status:'🟢 Online'};
 const words=["TIGER","GHOST","NINJA","WOLF","EAGLE","SHARK","FIRE","ICE","STORM","SHADOW","FOX","LION","DRAGON","VIPER","COBRA","PHANTOM","BLAZE","FROST"];
-function generateCode(){let w=words[Math.floor(Math.random()*words.length)];let n=Math.floor(1000+Math.random()*9000);let c=w+"-"+n;generatedCode.innerText=c;roomCode.value=c;}generateCode();
-function setEmoji(e){myProfile.emoji=e;picEmoji.innerText=e;}
-function saveProfile(){myProfile.display=displayName.value.trim()||myId;myProfile.bio=bio.value.trim();myProfile.status=status.value;localStorage.setItem('myProfile',JSON.stringify(myProfile));gun.get('profiles').get(myId).put(myProfile);profileMsg.innerText='✅ Saved (optional)';homeProfile.innerText=`${myProfile.emoji} ${myProfile.display} - ${myProfile.status}`;}
-function register(){if(!robotVerified){robotMsg.style.display='block';return;}let u=username.value.trim(),p=password.value.trim();if(u.length<4||p.length<3)return alert('Username 4+, Pass 3+');gunUser.create(u,p,ack=>{msg1.innerText=ack.err?"❌ "+ack.err:"✅ Created! Now Login";});}
-function login(){if(!robotVerified){robotMsg.style.display='block';return;}let u=username.value.trim(),p=password.value.trim();gunUser.auth(u,p,async ack=>{if(ack.err){msg1.innerText="❌ "+ack.err;}else{myId=u;myPair=gunUser._.sea;localStorage.setItem('anonUser',u);localStorage.setItem('anonPass',p);let saved=localStorage.getItem('myProfile');if(saved){myProfile=JSON.parse(saved);displayName.value=myProfile.display;bio.value=myProfile.bio;status.value=myProfile.status;setEmoji(myProfile.emoji);homeProfile.innerText=`${myProfile.emoji} ${myProfile.display}`;}else{displayName.value=u;homeProfile.innerText=`${u} - Profile optional`}loginScreen.style.display='none';mainApp.style.display='block';topUser.innerText='🔒 '+u;gun.get('pubkeys').get(myId).put({pub:myPair.pub,epub:myPair.epub});showSection('home');}});}
-
-function enterChat(){let code=roomCode.value.trim().toUpperCase();if(code.length<4){msg2.innerText="Code dalo e.g. TIGER-4829";return;}myRoom=code;localStorage.setItem('roomCode',code);needRoom.style.display='none';chatUI.style.display='block';roomName.innerText=myRoom;encInfo.innerText=myRoom+" + ECDH";showSection('chat');initChat();}
-
-let online,publicChat,privateChats,users={},selectedUser=null,selectedUserPub=null;
+let users={}, selectedUser=null, chatMode='public';
 function initChat(){
- online=gun.get('room-'+myRoom+'-users');
- publicChat=gun.get('room-'+myRoom+'-public');
- privateChats=gun.get('room-'+myRoom+'-private');
- online.get(myId).put({id:myId,profile:myProfile,time:Date.now()});
+  const presenceRef = db.ref('rooms/'+myRoom+'/presence');
+  const myRef = presenceRef.child(myId);
+  db.ref('.info/connected').on('value', s=>{ if(s.val()){ myRef.onDisconnect().remove(); myRef.set({id:myId, time:Date.now()}); }});
+  presenceRef.on('value', snap=>{ count.innerText=snap.numChildren(); });
+  db.ref('rooms/'+myRoom+'/public').limitToLast(100).on('child_added', snap=>{ let m=snap.val(); if(m && chatMode=='public') addPublicMsg(m.text); });
+   }
  online.map().on((d,id)=>{if(!d)return;if(Date.now()-d.time>35000){online.get(id).put(null);return;}if(id==myId)return;users[id]=d;renderUsers();});
  setInterval(()=>online.get(myId).put({id:myId,profile:myProfile,time:Date.now()}),5000);
  // Public anon messages listener - E2E with room code only
@@ -185,13 +187,12 @@ function switchChat(mode){
  if(mode==='public'){messages.innerHTML=`<p style="text-align:center;color:#00b894;font-size:11px">🌍 Public Room ${myRoom}<br>All msgs visible but ANONYMOUS (no name) • Encrypted with Room Key</p>`;publicChat.map().on(async m=>{if(!m||!m.enc)return;try{let dec=await SEA.decrypt(m.enc,myRoom);if(dec)addPublicMsg(dec);}catch(e){}});}
  else{messages.innerHTML=`<p style="text-align:center;color:#888;font-size:11px">🔒 Select user from left for private E2E chat<br>Only you two can decrypt</p>`;}
 }
-function addPublicMsg(t){let d=document.createElement('div');d.className='msg anon';d.innerText='🕶️ Anonymous: '+t;messages.appendChild(d);messages.scrollTop=99999;}
-function addPrivateMsg(t,ty){let d=document.createElement('div');d.className='msg '+ty;d.innerText=t;messages.appendChild(d);messages.scrollTop=99999;}
 function openPrivate(id){
- selectedUser=id;chatMode='private';btnPublic.classList.remove('active');btnPrivate.classList.add('active');
- gun.get('pubkeys').get(id).once(d=>{if(d)selectedUserPub=d;});
- messages.innerHTML=`<p style="text-align:center;color:#00b894;font-size:11px">🔒 Private E2E with ${id}<br>RoomKey + ECDH • No one else can read</p>`;
- let chatId=[myId,selectedUser,myRoom].sort().join('_');
+  selectedUser=id; chatMode='private';
+  messages.innerHTML=`<p style="text-align:center;color:#00b894">🔒 Private with ${id}</p>`;
+  let chatId=[myId,id].sort().join('_');
+  db.ref('rooms/'+myRoom+'/private/'+chatId).limitToLast(100).on('child_added', snap=>{ let m=snap.val(); addPrivateMsg(m.text, m.from==myId?'me':'other'); });
+ }
  privateChats.get(chatId).map().on(async m=>{if(!m||!m.enc)return;try{let secret=selectedUserPub?await SEA.secret(selectedUserPub.epub,myPair):myRoom;let dec=await SEA.decrypt(m.enc,secret+myRoom);if(dec)addPrivateMsg(dec,m.from==myId?'me':'other');}catch(e){}});
 }
 async function sendMsg(){
