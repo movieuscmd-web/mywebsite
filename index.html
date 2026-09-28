@@ -34,6 +34,8 @@
 .profilePic{width:86px;height:86px;border-radius:50%;background:#6c5ce7;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 10px;overflow:hidden;border:3px solid #fff;cursor:pointer}
 .emojiPicker{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0}.emojiPicker span{font-size:22px;cursor:pointer;padding:5px;border-radius:6px;background:#2d2d2d}
 </style>
+ <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
 </head>
@@ -205,5 +207,12 @@ function logout(){localStorage.clear();location.reload();}
 setInterval(()=>{if(hp1.value!=""||hp2.value!=""){document.body.innerHTML="<h1 style='text-align:center;margin-top:100px'>🤖 Bot Detected - Blocked by Honeypot</h1>";}},800);
 window.onload=()=>{let su=localStorage.getItem('anonUser'),sp=localStorage.getItem('anonPass');if(su&&sp){username.value=su;password.value=sp;}}
 </script>
+ <script>
+const firebaseConfig = { /* TERA CONFIG */ };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Ye tere #users aur #chatArea ko zinda karega
+ </script>
 </body>
 </html>
